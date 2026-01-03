@@ -48,7 +48,17 @@ export default function ManageForms() {
 
   const handleProgramChange = (progId: string) => {
     const selectedProg: any = data.programs.find((p: any) => p._id === progId);
-    setAvailableYears(selectedProg?.academicYears || []);
+
+    let years: string[] = [];
+    if (selectedProg?.academicYears) {
+      if (Array.isArray(selectedProg.academicYears)) {
+        years = selectedProg.academicYears;
+      } else if (typeof selectedProg.academicYears === 'string') {
+        years = selectedProg.academicYears.split(',').map((y: string) => y.trim()).filter((y: string) => y);
+      }
+    }
+
+    setAvailableYears(years);
     setSelections({ ...selections, programId: progId, academicYear: "", subjectId: "" });
   };
 
