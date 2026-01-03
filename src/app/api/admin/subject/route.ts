@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
-    
+
     // 1. Strict Validation
     if (!body.facultyId || !body.deptId || !body.programId || !body.name) {
       return NextResponse.json({ error: "Missing required fields (Name, Faculty, Dept, or Program)" }, { status: 400 });
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     // 3. Specific Duplicate Key Error Handling
     if (error.code === 11000) {
       return NextResponse.json(
-        { error: `Conflict: A subject with code '${error.keyValue?.code}' already exists.` }, 
+        { error: `Conflict: A subject with code '${error.keyValue?.code}' already exists.` },
         { status: 400 }
       );
     }
@@ -46,32 +46,65 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(req.url);
     const programId = searchParams.get("programId");
     const deptId = searchParams.get("deptId");
-    
+
     let query: any = {};
-    
+
     // Validate and cast ObjectIds to prevent casting 500 errors
     if (programId && mongoose.isValidObjectId(programId)) {
-        query.programId = new mongoose.Types.ObjectId(programId);
+      query.programId = new mongoose.Types.ObjectId(programId);
     }
     if (deptId && mongoose.isValidObjectId(deptId)) {
-        query.deptId = new mongoose.Types.ObjectId(deptId);
+      query.deptId = new mongoose.Types.ObjectId(deptId);
     }
-    
+
     // Pass other filters if present
     if (searchParams.get("academicYear")) query.academicYear = searchParams.get("academicYear");
     if (searchParams.get("division")) query.division = searchParams.get("division")?.toUpperCase();
 
     const subjects = await Subject.find(query)
-      .populate("facultyId", "username") 
+      .populate("facultyId", "username")
       .lean();
-    
+
     return NextResponse.json(subjects || []);
   } catch (error: any) {
     console.error("Subject GET Error:", error.message);
     return NextResponse.json([], { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+    await Subject.findByIdAndDelete(id);
+    return NextResponse.json({ message: "Subject deleted" });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    await connectDB();
+    const body = await req.json();
+    const { id, ...updates } = body;
+    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+    // Handle ObjectIds if they are being updated
+    if (updates.programId) updates.programId = new mongoose.Types.ObjectId(updates.programId);
+    if (updates.deptId) updates.deptId = new mongoose.Types.ObjectId(updates.deptId);
+    if (updates.facultyId) updates.facultyId = new mongoose.Types.ObjectId(updates.facultyId);
+
+    const updated = await Subject.findByIdAndUpdate(id, updates, { new: true });
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

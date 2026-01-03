@@ -1,12 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function DepartmentsList() {
     const [departments, setDepartments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-    useEffect(() => {
+    const fetchDepts = () => {
         fetch("/api/admin/dept")
             .then((res) => res.json())
             .then((data) => {
@@ -14,7 +16,25 @@ export default function DepartmentsList() {
             })
             .catch((err) => console.error("Failed to load departments", err))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        fetchDepts();
     }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure? This will permanently delete the department.")) return;
+        try {
+            const res = await fetch(`/api/admin/dept?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setDepartments(prev => prev.filter(d => d._id !== id));
+            } else {
+                alert("Failed to delete");
+            }
+        } catch (e) {
+            alert("Error deleting");
+        }
+    };
 
     return (
         <div className="max-w-6xl mx-auto p-6">
@@ -53,9 +73,19 @@ export default function DepartmentsList() {
                                     <tr key={dept._id} className="hover:bg-gray-50">
                                         <td className="p-4 font-semibold text-gray-800">{dept.name}</td>
                                         <td className="p-4 text-gray-600 font-mono text-xs">{dept.hodId || "N/A"}</td>
-                                        <td className="p-4 text-right">
-                                            {/* Placeholder for future delete functionality */}
-                                            <span className="text-gray-400 text-xs">View Only</span>
+                                        <td className="p-4 text-right flex justify-end gap-2">
+                                            <Link
+                                                href={`/admin/setup-dept?id=${dept._id}`}
+                                                className="text-indigo-600 hover:bg-indigo-50 px-3 py-1 rounded text-sm font-medium transition-colors"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(dept._id)}
+                                                className="text-red-600 hover:bg-red-50 px-3 py-1 rounded text-sm font-medium transition-colors"
+                                            >
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

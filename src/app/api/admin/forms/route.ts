@@ -1,23 +1,23 @@
 import connectDB from "@/lib/db";
-import FeedbackForm from "@/models/Feedback"; 
+import FeedbackForm from "@/models/Feedback";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
-    
+
     // De-structure division and batch from the request body
-    const { 
-      title, 
-      deptId, 
-      programId, 
-      academicYear, 
-      subjectId, 
+    const {
+      title,
+      deptId,
+      programId,
+      academicYear,
+      subjectId,
       division, // Added
       batch,    // Added
       facultyId,
-      questions 
+      questions
     } = body;
 
     // Validation for required fields
@@ -65,9 +65,23 @@ export async function GET() {
       .populate("deptId", "name")
       .populate("subjectId", "name")
       .lean();
-      
+
     return NextResponse.json(forms || []);
   } catch (error: any) {
     return NextResponse.json([], { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+    await FeedbackForm.findByIdAndDelete(id);
+    return NextResponse.json({ message: "Form deleted" });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

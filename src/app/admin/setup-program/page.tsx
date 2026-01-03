@@ -1,28 +1,38 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+const AVAILABLE_YEARS = ["FE", "SE", "TE", "BE", "FY", "SY"];
+
 export default function SetupProgram() {
-  const [departments, setDepartments] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    type: "UG",
-    deptId: "",
-  });
-
-  // State for Checkboxes
+  const [formData, setFormData] = useState({ name: "", type: "UG", deptId: "" });
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
+  const [depts, setDepts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  const AVAILABLE_YEARS = formData.type === "UG"
-    ? ["FE", "SE", "TE", "BE"]
-    : ["FY", "SY"]; // Adjust for PG if needed
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("id");
 
   useEffect(() => {
-    fetch("/api/admin/dept").then(res => res.json()).then(setDepartments);
-  }, []);
+    fetch("/api/admin/dept")
+      .then(res => res.json())
+      .then(data => Array.isArray(data) ? setDepts(data) : setDepts([]));
+
+    if (editId) {
+      setLoading(true);
+      fetch("/api/admin/program")
+        .then(res => res.json())
+        .then(data => {
+          const prog = data.find((p: any) => p._id === editId);
+          if (prog) {
+            setFormData({ name: prog.name, type: prog.type, deptId: prog.deptId });
+            if (Array.isArray(prog.academicYears)) setSelectedYears(prog.academicYears);
+          }
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [editId]);
 
   const handleYearChange = (year: string) => {
     if (selectedYears.includes(year)) {
@@ -36,15 +46,16 @@ export default function SetupProgram() {
     e.preventDefault();
     setLoading(true);
 
-    // Prepare the data
     const payload = {
       ...formData,
-      academicYears: selectedYears
+      academicYears: selectedYears,
+      id: editId // Include ID if editing
     };
 
     try {
+      const method = editId ? "PUT" : "POST";
       const res = await fetch("/api/admin/program", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -52,13 +63,13 @@ export default function SetupProgram() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Program created successfully!");
+        alert(`Program ${editId ? "Updated" : "Created"} successfully!`);
         router.push("/admin/programs");
       } else {
-        alert("Error: " + (data.message || "Failed to create program"));
+        alert("Error: " + (data.message || "Failed"));
       }
     } catch (err) {
-      alert("Network or Server Error");
+      alert("Network Error");
     } finally {
       setLoading(false);
     }
@@ -69,7 +80,8 @@ export default function SetupProgram() {
       <Link href="/admin/programs" className="text-emerald-600 hover:underline mb-4 inline-block">&larr; Back to Programs</Link>
 
       <div className="bg-white p-8 rounded-lg shadow-md border-t-4 border-emerald-500">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Create Program</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">{editId ? "Edit Program" : "Create Program"}</h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Department Selection */}
           <div>
@@ -80,7 +92,7 @@ export default function SetupProgram() {
               value={formData.deptId}
             >
               <option value="">-- Select Dept --</option>
-              {departments.map((d: any) => <option key={d._id} value={d._id}>{d.name}</option>)}
+              {depts.map((d: any) => <option key={d._id} value={d._id}>{d.name}</option>)}
             </select>
           </div>
 
@@ -132,7 +144,8 @@ export default function SetupProgram() {
             disabled={loading || selectedYears.length === 0}
             className="w-full bg-emerald-600 text-white py-2 rounded font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors"
           >
-            {loading ? "Creating..." : "Create Program"}
+            {loading ? (editId ? "Updating..." : "Creating...") : (editId ? "Update Program" : "Create Program")}
+
           </button>
         </form>
       </div>

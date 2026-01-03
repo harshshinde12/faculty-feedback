@@ -1,12 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ProgramsList() {
     const [programs, setPrograms] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-    useEffect(() => {
+    const fetchPrograms = () => {
         fetch("/api/admin/program")
             .then((res) => res.json())
             .then((data) => {
@@ -14,7 +16,23 @@ export default function ProgramsList() {
             })
             .catch((err) => console.error("Failed to load programs", err))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        fetchPrograms();
     }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure? This will delete the program.")) return;
+        try {
+            const res = await fetch(`/api/admin/program?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setPrograms(prev => prev.filter(p => p._id !== id));
+            } else {
+                alert("Failed to delete");
+            }
+        } catch (e) { alert("Error deleting"); }
+    };
 
     return (
         <div className="max-w-6xl mx-auto p-6">
@@ -47,6 +65,7 @@ export default function ProgramsList() {
                                     <th className="p-4">Type</th>
                                     <th className="p-4">Years</th>
                                     <th className="p-4">Department ID</th>
+                                    <th className="p-4 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -54,14 +73,27 @@ export default function ProgramsList() {
                                     <tr key={prog._id} className="hover:bg-gray-50">
                                         <td className="p-4 font-semibold text-gray-800">{prog.name}</td>
                                         <td className="p-4">
-                                            <span className={`px-2 py-1 rounded text-xs font-medium ${prog.type === 'UG' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
-                                                {prog.type}
-                                            </span>
+                                            <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-bold">{prog.type}</span>
                                         </td>
                                         <td className="p-4 text-sm text-gray-600">
-                                            {prog.academicYears?.join(", ")}
+                                            {/* Handle both array (new) and string (legacy) if exists */}
+                                            {Array.isArray(prog.academicYears) ? prog.academicYears.join(", ") : prog.academicYears}
                                         </td>
                                         <td className="p-4 text-gray-400 text-xs font-mono">{prog.deptId}</td>
+                                        <td className="p-4 text-right flex justify-end gap-2">
+                                            <Link
+                                                href={`/admin/setup-program?id=${prog._id}`}
+                                                className="text-indigo-600 hover:bg-indigo-50 px-3 py-1 rounded text-sm font-medium transition-colors"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(prog._id)}
+                                                className="text-red-600 hover:bg-red-50 px-3 py-1 rounded text-sm font-medium transition-colors"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

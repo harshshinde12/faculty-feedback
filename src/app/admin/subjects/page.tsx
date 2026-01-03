@@ -1,20 +1,38 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function SubjectsList() {
     const [subjects, setSubjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-    useEffect(() => {
+    const fetchSubjects = () => {
         fetch("/api/admin/subject")
             .then((res) => res.json())
             .then((data) => {
                 if (Array.isArray(data)) setSubjects(data);
             })
-            .catch((err) => console.error("Failed to load subjects", err))
+            .catch((err) => console.error(err))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        fetchSubjects();
     }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this subject?")) return;
+        try {
+            const res = await fetch(`/api/admin/subject?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setSubjects(prev => prev.filter(s => s._id !== id));
+            } else {
+                alert("Failed to delete");
+            }
+        } catch (e) { alert("Error deleting"); }
+    };
 
     return (
         <div className="max-w-6xl mx-auto p-6">
@@ -55,19 +73,40 @@ export default function SubjectsList() {
                                     <tr key={sub._id} className="hover:bg-gray-50">
                                         <td className="p-4 font-semibold text-gray-800">
                                             {sub.name}
-                                            <div className="text-xs text-gray-400 font-normal">{sub.division ? `Div: ${sub.division}` : ''}</div>
                                         </td>
-                                        <td className="p-4 text-sm text-gray-600 font-mono">{sub.code || "N/A"}</td>
+                                        <td className="p-4 text-sm font-mono text-gray-600">{sub.code}</td>
                                         <td className="p-4 text-sm">
-                                            <span className="bg-orange-50 text-orange-700 px-2 py-1 rounded text-xs font-medium">
+                                            <span className="bg-orange-50 text-orange-700 px-2 py-1 rounded text-xs font-bold">
                                                 {sub.academicYear}
                                             </span>
                                         </td>
                                         <td className="p-4 text-sm text-gray-600">
-                                            {sub.facultyId?.username || "Unassigned"}
+                                            {sub.facultyId ? (
+                                                <span className="flex items-center gap-2">
+                                                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                                    {/* Ideally we fetch faculty name, but ID/Username is often stored or populated. 
+                                                       The API populates checking previous implementation. 
+                                                       Checking `api/admin/subject/route.ts`: it does `populate('facultyId', 'username')`. 
+                                                       So `sub.facultyId` is an object. */}
+                                                    {sub.facultyId.username || "Assigned"}
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-400 italic">Unassigned</span>
+                                            )}
                                         </td>
-                                        <td className="p-4 text-right">
-                                            <span className="text-gray-400 text-xs">View Only</span>
+                                        <td className="p-4 text-right flex justify-end gap-2">
+                                            <Link
+                                                href={`/admin/setup-subject?id=${sub._id}`}
+                                                className="text-indigo-600 hover:bg-indigo-50 px-3 py-1 rounded text-sm font-medium transition-colors"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(sub._id)}
+                                                className="text-red-600 hover:bg-red-50 px-3 py-1 rounded text-sm font-medium transition-colors"
+                                            >
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
