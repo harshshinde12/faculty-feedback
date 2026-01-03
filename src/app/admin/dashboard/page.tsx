@@ -12,10 +12,10 @@ export default function AdminDashboard() {
   const [promoting, setPromoting] = useState(false);
   const navCards = [
     { title: "User Management", desc: "View & Manage Users", icon: <Users />, href: "/admin/users", color: "bg-blue-500" },
-    { title: "Departments", desc: "Setup Depts & Link HODs", icon: <Layers />, href: "/admin/setup-dept", color: "bg-purple-500" },
-    { title: "Programs", desc: "Setup UG/PG (FE, SE, TE, BE)", icon: <GitBranch />, href: "/admin/setup-program", color: "bg-emerald-500" },
-    { title: "Subjects", desc: "Add Subjects & Assign Faculty", icon: <BookOpen />, href: "/admin/setup-subject", color: "bg-orange-500" },
-    { title: "Feedback Forms", desc: "Create & Manage Feedback Questionnaires", icon: <ClipboardList />, href: "/admin/manage-forms", color: "bg-rose-500" },
+    { title: "Departments", desc: "Manage Depts & HODs", icon: <Layers />, href: "/admin/departments", color: "bg-purple-500" },
+    { title: "Programs", desc: "Manage UG/PG Programs", icon: <GitBranch />, href: "/admin/programs", color: "bg-emerald-500" },
+    { title: "Subjects", desc: "Manage Subjects & Faculty", icon: <BookOpen />, href: "/admin/subjects", color: "bg-orange-500" },
+    { title: "Feedback Forms", desc: "Manage & Create Forms", icon: <ClipboardList />, href: "/admin/feedback-forms", color: "bg-rose-500" },
   ];
 
   return (
