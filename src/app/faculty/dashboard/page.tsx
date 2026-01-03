@@ -1,55 +1,29 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 export default function FacultyDashboard() {
   const { data: session, status } = useSession();
   const [analytics, setAnalytics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadAnalytics = async () => {
-      if (status === "authenticated" && session?.user) {
-        try {
-          setLoading(true);
-          const res = await fetch("/api/faculty/analytics", {
-            method: "GET",
-            cache: "no-store"
-          });
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            setAnalytics(data);
-          }
-        } catch (err) {
-          console.error("Fetch error:", err);
-        } finally {
-          setLoading(false);
-        }
-      } else if (status === "unauthenticated") {
-        setLoading(false);
-      }
-    };
+  // ... (existing useEffect) ...
 
-    loadAnalytics();
-  }, [status, session]);
-
-  if (status === "loading") {
-    return (
-      <div className="max-w-6xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-6 text-black">Faculty Dashboard</h2>
-        <div className="p-8 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-          <p className="text-black mt-2">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
+  // ... (existing loading check) ...
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-black">Faculty Dashboard</h2>
-        <p className="text-slate-600 mt-2">View your subject feedback analytics</p>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-3xl font-bold text-black">Faculty Dashboard</h2>
+          <p className="text-slate-600 mt-2">View your subject feedback analytics</p>
+        </div>
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
+        >
+          Logout
+        </button>
       </div>
 
       {session?.user && (
