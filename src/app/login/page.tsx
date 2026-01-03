@@ -25,11 +25,12 @@ export default function LoginPage() {
       // Small delay to let session sync, then redirect
       const res = await fetch("/api/auth/session");
       const session = await res.json();
-      
+
       const role = session?.user?.role;
       if (role === "ADMIN") router.push("/admin/dashboard");
       else if (role === "HOD") router.push("/hod/analytics");
       else if (role === "STUDENT") router.push("/student/dashboard");
+      else if (role === "FACULTY") router.push("/faculty/dashboard");
       else router.refresh();
     }
   };
@@ -40,12 +41,12 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Feedback System Login</h1>
         {error && <p className="text-red-500 text-sm mb-4 text-center bg-red-50 p-2 rounded">{error}</p>}
         <div className="space-y-4">
-          <input 
+          <input
             type="text" placeholder="Username" required
             className="w-full border p-3 rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
             onChange={(e) => setUsername(e.target.value)}
           />
-          <input 
+          <input
             type="password" placeholder="Password" required
             className="w-full border p-3 rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
             onChange={(e) => setPassword(e.target.value)}

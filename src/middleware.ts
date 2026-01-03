@@ -15,6 +15,9 @@ export default withAuth(
     if (path.startsWith("/student") && role !== "STUDENT") {
       return NextResponse.redirect(new URL("/login", req.url));
     }
+    if (path.startsWith("/faculty") && role !== "FACULTY") {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
   },
   {
     callbacks: {
@@ -23,6 +26,6 @@ export default withAuth(
   }
 );
 
-export const config = { 
-  matcher: ["/admin/:path*", "/hod/:path*", "/student/:path*"] 
+export const config = {
+  matcher: ["/admin/:path*", "/hod/:path*", "/student/:path*", "/faculty/:path*"]
 };
