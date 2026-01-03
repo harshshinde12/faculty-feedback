@@ -39,8 +39,17 @@ export default function SetupUsers() {
 
   const handleProgramChange = (progId: string) => {
     const selectedProg: any = data.programs.find((p: any) => p._id === progId);
-    // Academic Years FE, SE, etc. come from the Program model
-    setAvailableYears(selectedProg?.academicYears || []);
+    let years: string[] = [];
+
+    if (selectedProg) {
+      const ay = selectedProg.academicYears;
+      if (Array.isArray(ay)) {
+        years = ay;
+      } else if (typeof ay === "string" && ay.trim() !== "") {
+        years = ay.includes(",") ? ay.split(",").map((y: string) => y.trim()) : [ay];
+      }
+    }
+    setAvailableYears(years);
     setFormData({ ...formData, programId: progId, academicYear: "" });
   };
 
@@ -60,10 +69,10 @@ export default function SetupUsers() {
   return (
     <div className="max-w-2xl mx-auto p-8 bg-white rounded-2xl shadow-lg border border-slate-100">
       <h2 className="text-2xl font-bold mb-6 text-slate-800">Account Management</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <select 
+          <select
             className="p-3 border rounded-xl bg-slate-50"
             value={role}
             onChange={(e) => setRole(e.target.value)}
@@ -72,33 +81,33 @@ export default function SetupUsers() {
             <option value="FACULTY">Faculty</option>
             <option value="HOD">HOD</option>
           </select>
-          
-          <input 
+
+          <input
             type="text" placeholder="Username" required
             className="p-3 border rounded-xl bg-slate-50"
-            onChange={(e) => setFormData({...formData, username: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           />
         </div>
 
-        <input 
+        <input
           type="password" placeholder="Set Password" required
           className="w-full p-3 border rounded-xl bg-slate-50"
-          onChange={(e) => setFormData({...formData, password: e.target.value})}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
 
         {/* CASCADING DROPDOWNS FOR STUDENTS */}
         {role === "STUDENT" && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <select 
+              <select
                 className="p-3 border rounded-xl bg-white" required
-                onChange={(e) => setFormData({...formData, deptId: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, deptId: e.target.value })}
               >
                 <option value="">Select Dept</option>
                 {data.depts.map((d: any) => <option key={d._id} value={d._id}>{d.name}</option>)}
               </select>
 
-              <select 
+              <select
                 className="p-3 border rounded-xl bg-white disabled:opacity-50"
                 disabled={!formData.deptId} required
                 onChange={(e) => handleProgramChange(e.target.value)}
@@ -107,10 +116,10 @@ export default function SetupUsers() {
                 {data.programs.map((p: any) => <option key={p._id} value={p._id}>{p.name}</option>)}
               </select>
 
-              <select 
+              <select
                 className="p-3 border rounded-xl bg-white disabled:opacity-50"
                 disabled={availableYears.length === 0} required
-                onChange={(e) => setFormData({...formData, academicYear: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
               >
                 <option value="">Select Year</option>
                 {availableYears.map(year => <option key={year} value={year}>{year}</option>)}
@@ -118,20 +127,20 @@ export default function SetupUsers() {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <input 
+              <input
                 type="text" placeholder="Roll No" required
                 className="p-3 border rounded-xl bg-slate-50"
-                onChange={(e) => setFormData({...formData, rollNo: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, rollNo: e.target.value })}
               />
-              <input 
+              <input
                 type="text" placeholder="Division (A/B)" required
                 className="p-3 border rounded-xl bg-slate-50"
-                onChange={(e) => setFormData({...formData, division: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, division: e.target.value })}
               />
-              <input 
+              <input
                 type="text" placeholder="Batch (Optional)"
                 className="p-3 border rounded-xl bg-slate-50"
-                onChange={(e) => setFormData({...formData, batch: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
               />
             </div>
           </div>
