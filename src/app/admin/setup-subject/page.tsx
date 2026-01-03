@@ -52,11 +52,18 @@ export default function SetupSubject() {
             const getVal = (field: any) => field && field._id ? field._id : (field || "");
             const pid = getVal(sub.programId);
 
-            // Set available years
+            // Set available years (Robust handler)
             if (pid && Array.isArray(allPrograms)) {
               const prog = allPrograms.find((p: any) => p._id === pid);
-              if (prog && Array.isArray(prog.academicYears)) {
-                setAvailableYears(prog.academicYears);
+              if (prog) {
+                let years: string[] = [];
+                const ay = prog.academicYears;
+                if (Array.isArray(ay)) {
+                  years = ay;
+                } else if (typeof ay === "string" && ay.trim() !== "") {
+                  years = ay.includes(",") ? ay.split(",").map((y: string) => y.trim()) : [ay];
+                }
+                setAvailableYears(years);
               }
             }
 
@@ -83,7 +90,18 @@ export default function SetupSubject() {
 
   const handleProgramChange = (progId: string) => {
     const selectedProg: any = data.programs.find((p: any) => p._id === progId);
-    setAvailableYears(selectedProg ? selectedProg.academicYears : []);
+    let years: string[] = [];
+
+    if (selectedProg) {
+      const ay = selectedProg.academicYears;
+      if (Array.isArray(ay)) {
+        years = ay;
+      } else if (typeof ay === "string" && ay.trim() !== "") {
+        // Handle legacy string (comma-separated or single value)
+        years = ay.includes(",") ? ay.split(",").map((y: string) => y.trim()) : [ay];
+      }
+    }
+    setAvailableYears(years);
     setFormData({ ...formData, programId: progId, academicYear: "" });
   };
 
