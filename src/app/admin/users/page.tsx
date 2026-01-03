@@ -59,12 +59,20 @@ export default function UserManagement() {
                     <h2 className="text-3xl font-bold text-gray-800">User Management</h2>
                     <p className="text-gray-500 mt-1">Manage system users and roles</p>
                 </div>
-                <button
-                    onClick={fetchUsers}
-                    className="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors"
-                >
-                    Refresh List
-                </button>
+                <div className="flex gap-3">
+                    <a
+                        href="/admin/setup-users"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    >
+                        <span>+ Add User</span>
+                    </a>
+                    <button
+                        onClick={fetchUsers}
+                        className="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors"
+                    >
+                        Refresh List
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -75,8 +83,8 @@ export default function UserManagement() {
                             key={role}
                             onClick={() => setActiveTab(role)}
                             className={`px-6 py-4 text-sm font-semibold transition-all ${activeTab === role
-                                    ? "border-b-2 border-indigo-600 text-indigo-600 bg-white"
-                                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                                ? "border-b-2 border-indigo-600 text-indigo-600 bg-white"
+                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                                 }`}
                         >
                             {role}s

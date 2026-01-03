@@ -11,7 +11,7 @@ async function promoteAll(): Promise<any> {
 export default function AdminDashboard() {
   const [promoting, setPromoting] = useState(false);
   const navCards = [
-    { title: "User Management", desc: "Create HODs, Faculty & Students", icon: <Users />, href: "/admin/setup-users", color: "bg-blue-500" },
+    { title: "User Management", desc: "View & Manage Users", icon: <Users />, href: "/admin/users", color: "bg-blue-500" },
     { title: "Departments", desc: "Setup Depts & Link HODs", icon: <Layers />, href: "/admin/setup-dept", color: "bg-purple-500" },
     { title: "Programs", desc: "Setup UG/PG (FE, SE, TE, BE)", icon: <GitBranch />, href: "/admin/setup-program", color: "bg-emerald-500" },
     { title: "Subjects", desc: "Add Subjects & Assign Faculty", icon: <BookOpen />, href: "/admin/setup-subject", color: "bg-orange-500" },
