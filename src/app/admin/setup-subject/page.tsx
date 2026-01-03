@@ -101,6 +101,12 @@ export default function SetupSubject() {
         years = ay.includes(",") ? ay.split(",").map((y: string) => y.trim()) : [ay];
       }
     }
+
+    // Fallback to standard years if empty
+    if (years.length === 0) {
+      years = ["FE", "SE", "TE", "BE", "FY", "SY"];
+    }
+
     setAvailableYears(years);
     setFormData({ ...formData, programId: progId, academicYear: "" });
   };

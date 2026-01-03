@@ -49,6 +49,9 @@ export default function SetupUsers() {
         years = ay.includes(",") ? ay.split(",").map((y: string) => y.trim()) : [ay];
       }
     }
+
+    if (years.length === 0) years = ["FE", "SE", "TE", "BE", "FY", "SY"];
+
     setAvailableYears(years);
     setFormData({ ...formData, programId: progId, academicYear: "" });
   };
