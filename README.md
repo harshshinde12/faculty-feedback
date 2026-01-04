@@ -3,7 +3,7 @@
 A comprehensive, role-based feedback management system developed for educational institutions. This platform enables seamless collection, analysis, and management of student feedback for faculty members, ensuring privacy and data-driven improvements.
 
 ## 🚀 Live Demo
-**[https://faculty-feedback-pi.vercel.app](https://faculty-feedback-pi.vercel.app)**
+**[https://faculty-feedback-gamma.vercel.app](https://faculty-feedback-gamma.vercel.app)**
 
 ## ✨ Key Features
 
