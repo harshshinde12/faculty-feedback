@@ -68,13 +68,23 @@ async function seedDatabase() {
     });
 
     // 3.2 HODs (One per Dept)
+    // 3.2 HODs (One per Dept)
     const hods = [
       { username: 'hod_cmpn', deptId: deptMap['CMPN'] },
       { username: 'hod_it', deptId: deptMap['IT'] },
       { username: 'hod_extc', deptId: deptMap['EXTC'] },
       { username: 'hod_aids', deptId: deptMap['AIDS'] }
     ];
-    await db.collection('users').insertMany(hods.map(h => ({ ...h, password: hashedPassword, role: 'HOD', createdAt: new Date() })));
+    const insertedHods = await db.collection('users').insertMany(hods.map(h => ({ ...h, password: hashedPassword, role: 'HOD', createdAt: new Date() })));
+
+    // Update Departments with hodId
+    const hodIds = Object.values(insertedHods.insertedIds);
+    for (let i = 0; i < hods.length; i++) {
+      await db.collection('departments').updateOne(
+        { _id: hods[i].deptId },
+        { $set: { hodId: hodIds[i] } }
+      );
+    }
 
     // 3.3 Faculty (10 Total)
     const facultyData = [
