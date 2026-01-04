@@ -1,0 +1,57 @@
+{
+  "programs": [
+    {
+      "id": "69592da077e78d7216c795fd",
+      "name": "B.Tech Computer Engineering",
+      "academicYears": [
+        "FE",
+        "SE",
+        "TE",
+        "BE"
+      ],
+      "type": "object"
+    },
+    {
+      "id": "69592da077e78d7216c795fe",
+      "name": "B.Tech IT",
+      "academicYears": [
+        "FE",
+        "SE",
+        "TE",
+        "BE"
+      ],
+      "type": "object"
+    },
+    {
+      "id": "69592da077e78d7216c795ff",
+      "name": "B.Tech EXTC",
+      "academicYears": [
+        "FE",
+        "SE",
+        "TE",
+        "BE"
+      ],
+      "type": "object"
+    },
+    {
+      "id": "69592da077e78d7216c79600",
+      "name": "B.Tech AI & DS",
+      "academicYears": [
+        "FE",
+        "SE",
+        "TE",
+        "BE"
+      ],
+      "type": "object"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "69592da077e78d7216c79607",
+      "name": "Data Structures & Algorithms",
+      "programId": "69592da077e78d7216c795fd",
+      "academicYear": "SE",
+      "division": "A"
+    }
+  ]
+}
